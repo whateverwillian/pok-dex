@@ -41,7 +41,7 @@ const Home: React.FC = () => {
       );
 
       // Esperamos a resposta da requisição
-      const pokemonsInfoResponse = await axios.all(requests);
+      const pokemonsInfoResponse: Response[] = await axios.all(requests);
 
       // Vamos percorrer cada uma das respostas
       const pokemonsInfo = pokemonsInfoResponse.map((response) => {
