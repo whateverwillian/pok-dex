@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView } from 'react-native'; // TEMPORÁRIO
+import { FlatList, View } from 'react-native'; // TEMPORÁRIO
 
 import Icon from 'react-native-vector-icons/Feather';
 import axios from 'axios';
@@ -22,7 +22,7 @@ import {
 } from './styles';
 
 interface Pokemon {
-  id: number;
+  id: string;
   name: string;
   types: PokemonType[];
   sprites: {
@@ -46,7 +46,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     async function loadPokemons(): Promise<void> {
       // Fazendo uma requisição e obtendo uma lista de pokémons
-      const { data } = await api.get('/pokemon');
+      const { data } = await api.get('/pokemon?limit=964');
 
       // Vamos percorrer por essa lista, fazendo uma requisição para cade pokémon
       const requests = data.results.map((pokemon: { name: string }) =>
@@ -88,36 +88,38 @@ const Home: React.FC = () => {
         <SearchBarText placeholder="What pokémon are you looking for?"></SearchBarText>
       </SearchBar>
 
-      <ScrollView>
-        {pokemons &&
-          pokemons.map((pokemon) => (
-            <CartPokemon key={pokemon.id} types={pokemon.types}>
-              <PokemonInfo>
-                <CartPokemonTextId>
-                  #{formatValue(pokemon.id)}
-                </CartPokemonTextId>
-                <CartPokemonTextName>
-                  {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
-                </CartPokemonTextName>
+      <FlatList
+      data={pokemons}
+      keyExtractor={item => item.id}
+      ListFooterComponent={<View />}
+      renderItem={({ item: pokemon }) => (
+        <CartPokemon types={pokemon.types}>
+          <PokemonInfo>
+            <CartPokemonTextId>
+              #{formatValue(Number(pokemon.id))}
+            </CartPokemonTextId>
+            <CartPokemonTextName>
+              {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+            </CartPokemonTextName>
 
-                <PokemonTypes>
-                  {pokemon.types.map((types) => (
-                    <CartPokemonTextType type={types.type.name}>
-                      {types.type.name}
-                    </CartPokemonTextType>
-                  ))}
-                </PokemonTypes>
-              </PokemonInfo>
-              <PokemonImage
-                source={{
-                  uri:
-                    `https://assets.pokemon.com/assets/cms2/img/pokedex/full/` +
-                    `${formatValue(pokemon.id)}.png`,
-                }}
-              />
-            </CartPokemon>
-          ))}
-      </ScrollView>
+            <PokemonTypes>
+              {pokemon.types.map((types) => (
+                <CartPokemonTextType type={types.type.name}>
+                  {types.type.name}
+                </CartPokemonTextType>
+              ))}
+            </PokemonTypes>
+          </PokemonInfo>
+          <PokemonImage
+            source={{
+              uri:
+                `https://assets.pokemon.com/assets/cms2/img/pokedex/full/` +
+                `${formatValue(Number(pokemon.id))}.png`,
+            }}
+          />
+        </CartPokemon>
+      )} />
+
     </Container>
   );
 };

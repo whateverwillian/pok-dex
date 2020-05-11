@@ -8,7 +8,7 @@ const types = {
     background: #a552cc;
   `,
   fire: css`
-    background: #fd7d24;
+    background: #fd7d28;
   `,
   flying: css`
     background: #748fc9;
@@ -21,6 +21,39 @@ const types = {
   `,
   normal: css`
     background: #9da0aa;
+  `,
+  dark: css`
+    background: #58575f;
+  `,
+  dragon: css`
+    background: #0f6ac0;
+  `,
+  electric: css`
+    background: #eed535;
+  `,
+  fairy: css`
+    background: #ed6ec7;
+  `,
+  fighting: css`
+    background: #d04164;
+  `,
+  ghost: css`
+    background: #556aae;
+  `,
+  ground: css`
+    background: #dd7748;
+  `,
+  ice: css`
+    background: #61cec0;
+  `,
+  psychic: css`
+    background: #ea5d60;
+  `,
+  rock: css`
+    background: #baab82;
+  `,
+  steel: css`
+    background: #417d9a;
   `,
 };
 
@@ -45,14 +78,47 @@ const cardTypes = {
   `,
   normal: css`
     background: #b5b9c4;
+`,
+  dark: css`
+    background: #6f6e78;
   `,
+  dragon: css`
+    background: #7383b9;
+  `,
+  electric: css`
+    background: #f2cb75;
+  `,
+  fairy: css`
+    background: #eba8c3;
+  `,
+  fighting: css`
+    background: #eb4971;
+  `,
+  ghost: css`
+    background: #8571be;
+  `,
+  ground: css`
+    background: #f78551;
+  `,
+  ice: css`
+    background: #91d8df;
+  `,
+  psychic: css`
+    background: #ff6568;
+  `,
+  rock: css`
+    background: #d4c294;
+  `,
+  steel: css`
+    background: #4c91b2;
+`,
 }
 
 interface TypeProps {
-  type?: keyof typeof types;
+  type?: keyof typeof types | string;
 }
 
-interface CardProps {
+export interface CardProps {
   types?: TypeProps[];
 }
 
@@ -124,7 +190,7 @@ export const CartPokemonTextId = styled.Text`
 export const CartPokemonTextName = styled.Text`
   color: white;
   font-weight: bold;
-  font-size: 30px;
+  font-size: 32px;
 `;
 
 export const PokemonTypes = styled.View`
@@ -132,7 +198,13 @@ export const PokemonTypes = styled.View`
 `;
 
 export const CartPokemonTextType = styled.Text<TypeProps>`
-  margin-right: 5px;
+  margin: 5px 5px 0 0;
+  padding: 4px 10px;
+  border-radius: 4px;
+  text-align: center;
+  height: 30px;
+  color: white;
+  font-weight: 500;
 
   ${({ type }) => types[type || 'normal']}
 `;
