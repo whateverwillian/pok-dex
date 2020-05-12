@@ -1,10 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { FlatList, View } from 'react-native'; // TEMPORÁRIO
+import { FlatList, View, Image } from 'react-native'; // TEMPORÁRIO
+import AsyncStorage from '@react-native-community/async-storage';
+
+import axios from 'axios';
+import api from '../../services/api';
 
 import Icon from 'react-native-vector-icons/Feather';
-import axios from 'axios';
+
 import formatValue from '../../utils/formatValue';
-import api from '../../services/api';
+import formatPokemonName from '../../utils/formatPokemonName';
+
+import { Pokemon, Response } from './styles/types';
 
 import {
   Container,
@@ -21,57 +27,49 @@ import {
   PokemonInfo,
 } from './styles';
 
-interface Pokemon {
-  id: string;
-  name: string;
-  types: PokemonType[];
-  sprites: {
-    front_default: string;
-  };
-}
-
-interface PokemonType {
-  type: {
-    name: string;
-  };
-}
-
-interface Response {
-  data: Pokemon;
-}
-
 const Home: React.FC = () => {
   const [pokemons, setPokemons] = useState<Pokemon[]>([]);
 
   useEffect(() => {
     async function loadPokemons(): Promise<void> {
-      // Fazendo uma requisição e obtendo uma lista de pokémons
-      const { data } = await api.get('/pokemon?limit=964');
 
-      // Vamos percorrer por essa lista, fazendo uma requisição para cade pokémon
-      const requests = data.results.map((pokemon: { name: string }) =>
-        api.get(`/pokemon/${pokemon.name}`),
-      );
+      // Temos duas opções aqui ->
+      // A) Já temos os dados salvos no Async Storage
+      // B) Não temos os dados, vamos ter que buscar, e dai colocamos no AsyncStorage
+      const alreadyHavePokemonsOnAsyncStorage = await AsyncStorage.getItem('@pokemons')
 
-      // Esperamos a resposta da requisição
-      const pokemonsInfoResponse: Response[] = await axios.all(requests);
+      if (alreadyHavePokemonsOnAsyncStorage) {
+        setPokemons(JSON.parse(alreadyHavePokemonsOnAsyncStorage));
+      } else {
+        // Fazendo uma requisição e obtendo uma lista de pokémons
+        const { data } = await api.get('/pokemon?limit=964');
 
-      // Vamos percorrer cada uma das respostas
-      const pokemonsInfo = pokemonsInfoResponse.map((response) => {
-        // Vamos pegar as informações do pokémon, e colocar no state
-        const { id, name, types, sprites } = response.data;
+        // Vamos percorrer por essa lista, fazendo uma requisição para cada pokémon
+        const requests = data.results.map((pokemon: { name: string }) =>
+          api.get(`/pokemon/${pokemon.name}`),
+        );
 
-        const pokemon = {
-          id,
-          name,
-          types,
-          sprites,
-        };
+        // Esperamos a resposta da requisição
+        const pokemonsInfoResponse: Response[] = await axios.all(requests);
 
-        return pokemon;
-      });
+        // Vamos percorrer cada uma das respostas
+        const pokemonsInfo = pokemonsInfoResponse.map((response) => {
+          // Vamos pegar as informações do pokémon, e colocar no state
+          const { id, name, types, sprites } = response.data;
 
-      setPokemons(pokemonsInfo);
+          const pokemon = {
+            id,
+            name,
+            types,
+            sprites,
+          };
+
+          return pokemon;
+        });
+
+        setPokemons(pokemonsInfo);
+        await AsyncStorage.setItem('@pokemons', JSON.stringify(pokemonsInfo));
+      }
     }
 
     loadPokemons();
@@ -85,27 +83,33 @@ const Home: React.FC = () => {
       </SubTitle>
       <SearchBar>
         <Icon name="search" size={20} color="#747476" />
-        <SearchBarText placeholder="What pokémon are you looking for?"></SearchBarText>
+        <SearchBarText onChange={() => {}}
+        placeholder="What pokémon are you looking for?"
+        ></SearchBarText>
       </SearchBar>
 
       <FlatList
+      showsVerticalScrollIndicator={false}
       data={pokemons}
-      keyExtractor={item => item.id}
+      keyExtractor={item => item.id.toString() } // O id vem como number
       ListFooterComponent={<View />}
       renderItem={({ item: pokemon }) => (
         <CartPokemon types={pokemon.types}>
           <PokemonInfo>
             <CartPokemonTextId>
-              #{formatValue(Number(pokemon.id))}
+              #{formatValue(pokemon.id)}
             </CartPokemonTextId>
             <CartPokemonTextName>
-              {pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1)}
+              {formatPokemonName(pokemon.name)}
             </CartPokemonTextName>
 
             <PokemonTypes>
-              {pokemon.types.map((types) => (
-                <CartPokemonTextType type={types.type.name}>
-                  {types.type.name}
+              {pokemon.types.map((current) => (
+                <CartPokemonTextType
+                key={`${pokemon.id}--${current.type.name}`}
+                type={{name: current.type.name}}
+                >
+                  {current.type.name}
                 </CartPokemonTextType>
               ))}
             </PokemonTypes>
@@ -114,7 +118,7 @@ const Home: React.FC = () => {
             source={{
               uri:
                 `https://assets.pokemon.com/assets/cms2/img/pokedex/full/` +
-                `${formatValue(Number(pokemon.id))}.png`,
+                `${formatValue(pokemon.id)}.png`,
             }}
           />
         </CartPokemon>
