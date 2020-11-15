@@ -89,39 +89,39 @@ const Home: React.FC = () => {
       </SearchBar>
 
       <FlatList
-      showsVerticalScrollIndicator={false}
-      data={pokemons}
-      keyExtractor={item => item.id.toString() } // O id vem como number
-      ListFooterComponent={<View />}
-      renderItem={({ item: pokemon }) => (
-        <CartPokemon types={pokemon.types}>
-          <PokemonInfo>
-            <CartPokemonTextId>
-              #{formatValue(pokemon.id)}
-            </CartPokemonTextId>
-            <CartPokemonTextName>
-              {formatPokemonName(pokemon.name)}
-            </CartPokemonTextName>
+        showsVerticalScrollIndicator={false}
+        data={pokemons}
+        keyExtractor={item => item.id.toString() } // O id vem como number
+        ListFooterComponent={<View />}
+        renderItem={({ item: pokemon }) => (
+          <CartPokemon types={pokemon.types}>
+            <PokemonInfo>
+              <CartPokemonTextId>
+                #{formatValue(pokemon.id)}
+              </CartPokemonTextId>
+              <CartPokemonTextName>
+                {formatPokemonName(pokemon.name)}
+              </CartPokemonTextName>
 
-            <PokemonTypes>
-              {pokemon.types.map((current) => (
-                <CartPokemonTextType
-                key={`${pokemon.id}--${current.type.name}`}
-                type={{name: current.type.name}}
-                >
-                  {current.type.name}
-                </CartPokemonTextType>
-              ))}
-            </PokemonTypes>
-          </PokemonInfo>
-          <PokemonImage
-            source={{
-              uri:
-                `https://assets.pokemon.com/assets/cms2/img/pokedex/full/` +
-                `${formatValue(pokemon.id)}.png`,
-            }}
-          />
-        </CartPokemon>
+              <PokemonTypes>
+                {pokemon.types.map((current) => (
+                  <CartPokemonTextType
+                  key={`${pokemon.id}--${current.type.name}`}
+                  type={{name: current.type.name}}
+                  >
+                    {current.type.name}
+                  </CartPokemonTextType>
+                ))}
+              </PokemonTypes>
+            </PokemonInfo>
+            <PokemonImage
+              source={{
+                uri:
+                  `https://assets.pokemon.com/assets/cms2/img/pokedex/full/` +
+                  `${formatValue(pokemon.id)}.png`,
+              }}
+            />
+          </CartPokemon>
       )} />
 
     </Container>
