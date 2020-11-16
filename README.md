@@ -39,6 +39,7 @@
 ## :rocket: Sobre o projeto
 
 <!-- [![Product Name Screen Shot][product-screenshot]](https://example.com) -->
+<img src="src/assets/app.gif" />
 
 Esse aplicativo é uma versão mobile da Pokédex, na qual você pode ver a listagem e descobrir mais informações sobre os pokémons!
 
